@@ -1,0 +1,25 @@
+{
+    "dev": {
+        "app_function": "download.handler",
+        "aws_region": "us-east-1",
+        "profile_name": "default",
+        "project_name": "punto-1",
+        "runtime": "python3.8",
+        "apigateway_enabled": false,
+        "keep_warm": false,
+        "s3_bucket": "zappa-lr7hqttc2",
+        "events": [{
+            "function": "download.trigger",
+            "event_source": {
+                  "arn":  "arn:aws:s3:::parcial2-bigdata-2021",
+                  "key_filters": [{
+                    "type": "prefix",
+                    "value": "stocks/"
+                }],
+                  "events": [
+                    "s3:ObjectCreated:*" 
+                ]
+             }
+        }]
+    }
+}

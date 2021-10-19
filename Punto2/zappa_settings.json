@@ -1,0 +1,25 @@
+{
+    "dev": {
+        "app_function": "app.handler",
+        "aws_region": "us-east-1",
+        "profile_name": "default",
+        "project_name": "punto2",
+        "runtime": "python3.8",
+        "s3_bucket": "zappa-sfsgvmo7q",
+        "keep_warm": false,
+        "apigateway_enabled": false,
+        "events": [{
+            "function": "app.trigger",
+            "event_source": {
+                "arn": "arn:aws:s3:::parcial-2do-corte",
+                "key_filters": [{
+                    "type": "prefix",
+                    "value": "news/"
+                }],
+                "events": [
+                    "s3:ObjectCreated:*"
+                ]
+            }
+        }]
+    }
+}

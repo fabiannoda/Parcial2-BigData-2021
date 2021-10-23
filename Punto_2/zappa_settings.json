@@ -13,13 +13,19 @@
             "event_source": {
                 "arn": "arn:aws:s3:::parcial-2do-corte",
                 "key_filters": [{
-                    "type": "prefix",
-                    "value": "headlines/raw/"
-                }],
+                        "type": "prefix",
+                        "value": "headlines/raw/"
+                    },
+                    {
+                        "type": "suffix",
+                        "value": ".html"
+                    }
+                ],
                 "events": [
                     "s3:ObjectCreated:*"
                 ]
             }
         }]
+
     }
 }

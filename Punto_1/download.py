@@ -4,12 +4,31 @@ import pandas as pd
 import urllib
 import boto3
 def format_date(date_datetime):
+    """
+    Hace un formateo de las fechas que vienen en datetime para convertirlo en tiempo en segundos transcurridos desde epoch en la hora local
+
+    Args:
+        date_datetime: Parámetro a formatear de tipo datetime
+
+    Returns: 
+        date_int: Ojeto time formateafo y casteado a entero
+    """
     date_timetuple = date_datetime.timetuple()
     date_mktime = time.mktime(date_timetuple)
     date_int = int(date_mktime)
     return date_int
 
 def handler(event, context):
+    """
+    Descarga un archivo .csv haciendo una petición a un 'end point' para distintos codigos de acciones, ésto a partir de la fecha del dia anterior, validando que sea un dia laboral y manejando la excepción para cuando no encuentre el archivo de la petición
+
+    Args:
+        event: Parámetro por defecto para una función lambda
+        context: Parámetro por defecto para una función lambda
+    
+    Exceptions: 
+        urllib.error.HTTPError: Si el archivo pedido no aparece se crea uno con las mismas columnas pero todos los valor en 0
+    """
     s3 = boto3.resource('s3')
     dt_start = datetime.today() - timedelta(days=2)
     dt_end = datetime.today() - timedelta(days=1)
@@ -34,6 +53,13 @@ def handler(event, context):
 
 
 def trigger(event, context):
+    """
+    Ejecuta un Athena query para actualizar las particiones de la tabla luego de creado un nuevo archivo en S3
+
+    Args:
+        event: Parámetro por defecto para una función lambda
+        context: Parámetro por defecto para una función lambda
+    """
     client = boto3.client('athena')
     response = client.start_query_execution(
         QueryString='msck repair table stocks',

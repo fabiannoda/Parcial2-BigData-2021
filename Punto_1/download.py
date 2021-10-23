@@ -20,7 +20,7 @@ def format_date(date_datetime):
 
 def handler(event, context):
     """
-    Descarga un archivo .csv haciendo una petición a un 'end point' para distintos codigos de acciones, ésto a partir de la fecha del dia anterior, validando que sea un dia laboral y manejando la excepción para cuando no encuentre el archivo de la petición
+    Descarga un archivo .csv haciendo una petición a un 'end point' para distintos codigos de acciones, ésto a partir de la fecha del dia anterior, validando que sea un dia laboral y manejando la excepción para cuando no encuentre el archivo de la petición. Al finalizar se suben los resultados a un bucket de S3
 
     Args:
         event: Parámetro por defecto para una función lambda

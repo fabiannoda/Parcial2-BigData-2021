@@ -11,7 +11,7 @@ def format_date(date_datetime):
         date_datetime: Parámetro a formatear de tipo datetime
 
     Returns: 
-        date_int: Ojeto time formateafo y casteado a entero
+        date_int: Objeto time formateado y casteado a entero
     """
     date_timetuple = date_datetime.timetuple()
     date_mktime = time.mktime(date_timetuple)
@@ -30,24 +30,23 @@ def handler(event, context):
         urllib.error.HTTPError: Si el archivo pedido no aparece se crea uno con las mismas columnas pero todos los valor en 0
     """
     s3 = boto3.resource('s3')
-    dt_start = datetime.today() - timedelta(days=2)
-    dt_end = datetime.today() - timedelta(days=1)
-    if dt_start.weekday() in [0,1,2,3,6] and dt_end.weekday() in [0,1,2,3,4]:
+    dt_start = datetime(2021,10,21) - timedelta(days=1)
+    dt_start = dt_start.replace(hour=23)
+    if dt_start.weekday() < 5:
     
         start = format_date(dt_start)
-        end = format_date(dt_end)
         names = ['AVHOQ', 'EC', 'AVAL', 'CMTOY']
 
         for i in range(len(names)):
             try:
-                df = pd.read_csv(f'https://query1.finance.yahoo.com/v7/finance/download/{names[i]}?period1={start}&period2={end}&interval=1d&events=history&includeAdjustedClose=true')
+                df = pd.read_csv(f'https://query1.finance.yahoo.com/v7/finance/download/{names[i]}?period1={start}&period2={start}&interval=1d&events=history&includeAdjustedClose=true')
                 df.to_csv(f'/tmp/{names[i]}.csv', index=False)
             except urllib.error.HTTPError as e:
                 filesito = open(f'/tmp/{names[i]}.csv','w+')
-                filesito.write(f'Date,Open,High,Low,Close,Adj Close,Volume \n{dt_end.strftime("%Y-%m-%d")},0,0,0,0,0,0')
+                filesito.write(f'Date,Open,High,Low,Close,Adj Close,Volume \n{dt_start.strftime("%Y-%m-%d")},0,0,0,0,0,0')
                 filesito.close()
 
-            s3.meta.client.upload_file(f'/tmp/{names[i]}.csv', 'parcial2-bigdata-2021', f'stocks/company={names[i]}/year={dt_end.year}/month={dt_end.month}/day={dt_end.day}/{names[i]}.csv')
+            s3.meta.client.upload_file(f'/tmp/{names[i]}.csv', 'parcial2-bigdata-2021', f'stocks/company={names[i]}/year={dt_start.year}/month={dt_start.month}/day={dt_start.day}/{names[i]}.csv')
     else:
         print('fechas no validas')
 
@@ -65,5 +64,10 @@ def trigger(event, context):
         QueryString='msck repair table stocks',
         QueryExecutionContext={
             'Database': 'stocks',
-        }
+        },
+        ResultConfiguration={
+            'OutputLocation': 's3://grades-bigdata-2021/paper/'
+        },
+        WorkGroup='primary'
+
     )
